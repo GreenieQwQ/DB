@@ -13,7 +13,7 @@ public class Connector {
             // The newInstance() call is a work around for some
             // broken Java implementations
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306" + "/" + DBName +
-                    "?" + "user=root&password=greenie" + "&serverTimezone=UTC");
+                    "?" + "user=root&password=None" + "&serverTimezone=UTC");
 
             // Do something with the Connection
             Statement stmt = null;
