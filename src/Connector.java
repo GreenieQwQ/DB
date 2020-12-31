@@ -4,16 +4,29 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
-
 public class Connector {
+    public static Connection conn = null;
+    public static Statement st2 = null;
+
+    public static ResultSet executeQuery (String sql) {
+        ResultSet rs= null;
+        try {
+            st2 = conn. createStatement (ResultSet. TYPE_SCROLL_SENSITIVE,
+                    ResultSet. CONCUR_READ_ONLY);
+                    rs= st2.executeQuery (sql);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }//End try
+        return rs;
+    }
+
     public static void main(String[] args) {
-        String DBName = "jxgl";
         try {
             LoadDriver.load();
             // The newInstance() call is a work around for some
             // broken Java implementations
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306" + "/" + DBName +
-                    "?" + "user=root&password=None" + "&serverTimezone=UTC");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306" + "/" + ConfigIni.DBName +
+                    "?" + "user=" + ConfigIni.passwd + "&password=" + ConfigIni.user + "&serverTimezone=UTC");
 
             // Do something with the Connection
             Statement stmt = null;
@@ -39,7 +52,7 @@ public class Connector {
             catch (SQLException ex){
                 // handle any errors
                 System.out.println("SQLException: " + ex.getMessage());
-                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println( "SQLState: " + ex.getSQLState());
                 System.out.println("VendorError: " + ex.getErrorCode());
             }
             finally {
