@@ -1,5 +1,5 @@
 public class ConfigIni {
-    static public String passwd = "None";
+    static public String passwd = "greenie";
     static public String user = "root";
-    static public String DBName = "jxgl";
+    static public String DBName = "enterprisedb";
 }
