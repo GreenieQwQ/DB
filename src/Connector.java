@@ -1,13 +1,10 @@
 import java.sql.*;
-import java. sql. * ;
 import javax. swing. JComboBox;
-import javax. swing. JList;
-import javax. swing. JOptionPane;
-import javax. swing. table. DefaultTableModel;
 
 public class Connector {
     public static Connection conn = null;
-    public static Statement st2 = null;
+    public static Statement stmt = null;
+    public static ResultSet rs = null;
 
     private static void handleSQLException(SQLException ex)
     {
@@ -17,14 +14,24 @@ public class Connector {
     }
 
 
-    // TODO: SQL防注入
+    // 执行查询SQL命令，返回记录集对象函数
+    public static ResultSet executeQuery (PreparedStatement stmt) {
+        try {
+            rs= stmt.executeQuery();
+        }catch(SQLException ex) {
+            handleSQLException(ex);
+        }
+        // 注意：free statement 会也会close result
+        return rs;
+    }
+
+    // TODO: 这个executeQuery 为什么要这样封装？
     // 执行查询SQL命令，返回记录集对象函数
     public static ResultSet executeQuery (String sql) {
-        ResultSet rs= null;
         try {
-            st2 = conn.createStatement (ResultSet. TYPE_SCROLL_SENSITIVE,
+            stmt = conn.createStatement (ResultSet. TYPE_SCROLL_SENSITIVE,
                     ResultSet. CONCUR_READ_ONLY);
-                    rs= st2.executeQuery (sql);
+                    rs= stmt.executeQuery (sql);
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -37,31 +44,30 @@ public class Connector {
     public static int executeUpdate (String sql) {
         int i= 0;
         try {
-            st2 = conn.createStatement (ResultSet. TYPE_SCROLL_SENSITIVE,
+            stmt = conn.createStatement (ResultSet. TYPE_SCROLL_SENSITIVE,
             ResultSet. CONCUR_READ_ONLY);
-            i = st2.executeUpdate (sql);
+            i = stmt.executeUpdate (sql);
             conn.commit ();
         }
         catch(Exception e) {
             e.printStackTrace();
         }
         finally {
-            free_Stmt(st2);
+            free_Stmt(stmt);
         }
         return i;
     }
 
     // 执行查询SQL命令，返回是否成功的函数
     public static boolean query (String sqlString) {
-        ResultSet rs = null;
         try {
-            rs = st2.executeQuery(sqlString);
+            rs = stmt.executeQuery(sqlString);
         }catch(Exception Ex) {
             System.out.println ("sql exception: " + Ex);
             return false;
         }
         finally{
-            free_Res_Stmt(rs, st2);
+            free_Res_Stmt(rs, stmt);
         }
         return true;
     }
@@ -70,7 +76,7 @@ public class Connector {
     public static boolean executeSQL (String sqlString) {
         boolean executeFlag;
         try {
-            st2.execute(sqlString);
+            stmt.execute(sqlString);
             executeFlag = true;
         } catch (Exception e) {
             executeFlag = false;
@@ -108,6 +114,7 @@ public class Connector {
     }
 
     public static boolean initialize() {
+        if (conn != null) return true;
         try {
             LoadDriver.load();
             // The newInstance() call is a work around for some
@@ -124,11 +131,14 @@ public class Connector {
         return true;
     }
 
+    public static void close() {
+        conn = null;
+        free_Res_Stmt(rs, stmt);
+    }
+
     public static void main(String[] args) {
         initialize();
         // Do something with the Connection
-        Statement stmt = null;
-        ResultSet rs = null;
         rs = executeQuery("SELECT * FROM course");
         try {
             ResultSetMetaData rsmd = rs.getMetaData();

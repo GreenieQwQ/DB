@@ -103,7 +103,7 @@ public class Login extends JFrame {
         stmt.setString(2, passwd);
 
         // 执行
-        ResultSet rs = stmt.executeQuery();
+        ResultSet rs = Connector.executeQuery(stmt);
 
         if(rs.next())
         {
@@ -115,7 +115,7 @@ public class Login extends JFrame {
             System.exit(114514);
         }
         else {
-            System.out.println("错误");
+            System.out.println("密码错误");
             new JOptionPane().showMessageDialog(null,
                     "用户名或密码错误",
                     "",
