@@ -5,8 +5,8 @@ import java.sql.*;
 
 public class Login extends JFrame {
     JFrame jf;
-    JTextField textName = new JTextField("admin");
-    JPasswordField textPassword = new JPasswordField("123456");
+    JTextField textName = new JTextField("张昊熹");
+    JPasswordField textPassword = new JPasswordField("18340207");
     JLabel label = new JLabel("人事工资管理系统");
     JButton buttonEnter = new JButton("登陆");
     JButton buttonCancel = new JButton("清空");
@@ -37,19 +37,19 @@ public class Login extends JFrame {
         buttonEnter.setFont(f);
         buttonEnter.addMouseListener(new MouseAdapter() {
             public void mouseClicked (MouseEvent me) {
-                String name = textName.getText();
-                String pwd = textPassword.getText();
-                if (name.equals("")) {
-                    new JOptionPane().showMessageDialog(null, "用户名不能为空！");
-                } else if (pwd.equals("")) {
-                    new JOptionPane().showMessageDialog(null, "密码不能为空！");
-                } else {
-                    try {
-                        Judge(name, pwd);
-                    } catch (SQLException sqlException) {
-                        sqlException.printStackTrace();
-                    }
+            String name = textName.getText();
+            String pwd = textPassword.getText();
+            if (name.equals("")) {
+                new JOptionPane().showMessageDialog(null, "用户名不能为空！");
+            } else if (pwd.equals("")) {
+                new JOptionPane().showMessageDialog(null, "密码不能为空！");
+            } else {
+                try {
+                    Judge(name, pwd);
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
                 }
+            }
             }
         });
         // 登录的键盘监听
@@ -111,8 +111,8 @@ public class Login extends JFrame {
             jf.setVisible(false);
             //关闭数据库连接
             //Connector.conn.close();
-            //new Main(); //开始主题运行界面
-            System.exit(114514);
+            new Main(); //开始主题运行界面
+            //System.exit(114514);
         }
         else {
             System.out.println("密码错误");
