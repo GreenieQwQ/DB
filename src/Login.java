@@ -110,7 +110,7 @@ public class Login extends JFrame {
             System .out. println ("密码正确");
             jf.setVisible(false);
             //关闭数据库连接
-            //Connector.conn.close();
+            Connector.conn.close();
             new Main(); //开始主题运行界面
             //System.exit(114514);
         }
