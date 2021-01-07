@@ -49,33 +49,61 @@ public class JTableDemo extends JFrame
         JPanel p2=new JPanel();
         JPanel p3=new JPanel();
         JPanel p4=new JPanel();
-        p4.setLayout(new GridLayout(5,1,5,5));
+        JPanel p5=new JPanel();
+        p5.setLayout(new GridLayout(6,1,5,5));
         Box bV=Box.createVerticalBox();
         Box bH1=Box.createHorizontalBox();
         Box bH2=Box.createHorizontalBox();
         Box bH3=Box.createHorizontalBox();
 
-        JLabel lbH1 = new JLabel("部门编号： ");
-        JLabel lbH2 = new JLabel("部门名称： ");
+        JLabel lbH1 = new JLabel("id： ");
+        JLabel lbH2 = new JLabel("sex： ");
+        JLabel lbH3 = new JLabel("name： ");
         lbH1.setFont(f1);
         lbH2.setFont(f1);
-        JTextField noText = new JTextField(20);
+        lbH3.setFont(f1);
+        JTextField idText = new JTextField(20);
+        JTextField sexText = new JTextField(20);
         JTextField nameText = new JTextField(20);
 
         JButton buttonFind = new JButton("查询");
-        JButton buttonCount = new JButton("统计人数");
+        JButton buttonCount = new JButton("插入");
 
         buttonFind.addMouseListener(new MouseAdapter() {
             public void mouseClicked (MouseEvent me) {
-                String name = lbH1.getText();
-                String pwd = lbH2.getText();
-                if (name.equals("")) {
+                String id = idText.getText();
+                String sex = sexText.getText();
+                String name = nameText.getText();
+                String[] stringArr= {id, sex, name};
+                // 在StringArr记得处理空值
+                int flag = 0;
+                String temp = "SELECT * FROM Worker ";
+                if (!id.equals("")) {
                     //new JOptionPane().showMessageDialog(null, "用户名不能为空！");
-                } else if (pwd.equals("")) {
-                    new JOptionPane().showMessageDialog(null, "密码不能为空！");
+                    if (flag == 0)
+                        temp += " WHERE ";
+                    temp += "id=\""+ id + "\"";
+                    flag += 1;
+                }
+                if (!sex.equals("")) {
+                    if (flag == 0)
+                        temp += " WHERE ";
+                    if (flag > 0)
+                        temp += " AND ";
+                    temp += "sex=\""+ sex+"\"";
+                    flag += 1;
+                }
+                if (!name.equals("")) {
+                    if (flag == 0)
+                        temp += " WHERE ";
+                    if (flag > 0)
+                        temp += " AND ";
+                    temp += "name=\""+ name+"\"";
+                    flag += 1;
                 }
                 try {
-                    findInfo(name, pwd);
+                    System.out.println(temp);
+                    findInfo(stringArr, temp);
                 }
                 catch (SQLException ex){
 
@@ -84,7 +112,7 @@ public class JTableDemo extends JFrame
         });
         buttonCount.addMouseListener(new MouseAdapter() {
             public void mouseClicked (MouseEvent me) {
-                deleteInfo();
+                insertInfo();
             }
         });
 //        bH1.add(Box.createVerticalStrut(20));
@@ -99,15 +127,19 @@ public class JTableDemo extends JFrame
         bH1.add(Box.createVerticalStrut(20));
         bH2.add(Box.createVerticalStrut(20));
         p1.add(lbH1);
-        p1.add(noText);
+        p1.add(idText);
         p2.add(lbH2);
-        p2.add(nameText);
-        p3.add(buttonFind);
-        p3.add(buttonCount);
+        p2.add(sexText);
+        p3.add(lbH3);
+        p3.add(nameText);
 
-        p4.add(p1);
-        p4.add(p2);
-        p4.add(p3);
+        p4.add(buttonFind);
+        p4.add(buttonCount);
+
+        p5.add(p1);
+        p5.add(p2);
+        p5.add(p3);
+        p5.add(p4);
 //        bV.add(bH1);
 //        bV.add(bH2);
 //        bV.add(bH3);
@@ -115,12 +147,12 @@ public class JTableDemo extends JFrame
         //contentPane.add(bV, BorderLayout.WEST);
 
         //con.add(scrollPane, BorderLayout.EAST);
-        setBounds(500,700,450,200);
+        setBounds(100,100,1300,700);
         con=new JPanel();
         con.setBorder(new EmptyBorder(5,5,5,5));
         con.setLayout(new BorderLayout(0,0));
         setContentPane(con);
-        con.add(p4, BorderLayout.WEST);
+        con.add(p5, BorderLayout.WEST);
         con.add(lb, BorderLayout.NORTH);
 
         JScrollPane scrollPane=new JScrollPane();
@@ -128,7 +160,8 @@ public class JTableDemo extends JFrame
         scrollPane.setViewportView(table);
         //frame.setVisible(true);
     }
-    public void findInfo(String name, String pwd) throws SQLException {
+    // findInfo希望能传递参数object
+    public void findInfo(String[] args, String sql) throws SQLException {
         if(!Connector.initialize()) {
             System.out.println("连接不上数据库...");
             new JOptionPane().showMessageDialog(null,
@@ -137,10 +170,12 @@ public class JTableDemo extends JFrame
                     JOptionPane.ERROR_MESSAGE);
             return;
         }  // 若连接失败返回
-        System.out.println("Hello, World!");
-        //rs = executeQuery("SELECT * FROM course");
+        System.out.println("Looking for data...");
+        for (int i = 0; i < args.length; i++) {
+            System.out.println(args[i]);
+        }
         DefaultTableModel tableModel= (DefaultTableModel)table.getModel();    //获得表格模型
-        tableModel.setRowCount(0);    //清空表格中的数据
+
 //        tableModel.setColumnIdentifiers(new Object[]{"书名","出版社","出版时间","丛书类别","定价"});    //设置表头
 //        tableModel.addRow(new Object[]{"Java从入门到精通（第2版）","清华大学出版社","2010-07-01","软件工程师入门丛书","59.8元"});    //增加列
 //        tableModel.addRow(new Object[]{"PHP从入门到精通（第2版）","清华大学出版社","2010-07-01","软件工程师入门丛书","69.8元"});
@@ -148,18 +183,25 @@ public class JTableDemo extends JFrame
 //        tableModel.addRow(new Object[]{"Visual C++从入门到精通（第2版）","清华大学出版社","2010-07-01","软件工程师入门丛书","69.8元" });
 //        table.setRowHeight(30);
 
-        String sql = "SELECT * FROM worker";
+//        String sql = "SELECT * FROM worker Where id=\"004\" ";
+//        String sql = "SELECT * FROM worker";
         // 防注入攻击
         // 预编译
         PreparedStatement stmt = Connector.conn.prepareStatement(sql);
-
+//        for (int i = 0; i < args.length; i++) {
+//            stmt.setString(i, args[i]);
+//        }
         // 执行
         ResultSet rs = Connector.executeQuery(stmt);
         ResultSetMetaData rsmd = rs.getMetaData();
-
+        // error在executeQuery会被catch到，能返回大概是空表，此时不出错
+//        if(rs!=null) {
+//            System.out.println("cannot find result?");
+//            return ;
+//        }
 //        Object[][] tableDate=new Object[5][8];
         Object[] title = {};
-
+        tableModel.setRowCount(0);    //清空表格中的数据
         for(int i = 1; i <= rsmd.getColumnCount(); i++) {
             title = appendValue(title, rsmd.getColumnName(i));
         }
@@ -175,9 +217,9 @@ public class JTableDemo extends JFrame
         tableModel.setColumnIdentifiers(title);
         table.setRowHeight(30);
         table.setModel(tableModel);    //应用表格模型
-        System.out.println("Hello, World2!");
+
     }
-    public void deleteInfo() {
+    public void insertInfo() {
         System.out.println("Delete, World!");
         //rs = executeQuery("SELECT * FROM course");
         DefaultTableModel tableModel=(DefaultTableModel) table.getModel();    //获得表格模型
