@@ -6,6 +6,7 @@ public class Connector {
     public static Statement stmt = null;
     public static ResultSet rs = null;
 
+    // 打印SQL语句执行中的问题
     private static void handleSQLException(SQLException ex)
     {
         System.out.println("SQLException: " + ex.getMessage());
@@ -15,7 +16,7 @@ public class Connector {
     }
 
 
-    // 执行查询SQL命令，返回记录集对象函数
+    // 执行查询预备SQL命令，返回记录集对象函数
     public static ResultSet executeQuery (PreparedStatement stmt) throws SQLException{
         try {
             rs= stmt.executeQuery();
@@ -28,8 +29,8 @@ public class Connector {
     }
 
     // 执行更新SQL命令，返回记录集对象函数
-    public static int executeUpdate (PreparedStatement stmt) throws SQLException{
-        int i= 0;
+    public static int executeUpdate (PreparedStatement stmt) {
+        int i= -1;
         try {
             i = stmt.executeUpdate();
         }
@@ -149,6 +150,7 @@ public class Connector {
         return true;
     }
 
+    // 关闭Connector
     public static void close() {
         conn = null;
         free_Res_Stmt(rs, stmt);
@@ -187,6 +189,7 @@ public class Connector {
 
     }
 
+    // 释放结果集
     private static void free_Res(ResultSet rs)
     {
         // it is a good idea to release
@@ -205,6 +208,7 @@ public class Connector {
         }
     }
 
+    // 释放语句
     public static void free_Stmt(Statement stmt)
     {
         // it is a good idea to release
@@ -233,6 +237,7 @@ public class Connector {
         free_Stmt(stmt);
     }
 
+    // 获取结果集的行数
     public static int getRowCnt(ResultSet rs)
     {
         int rowCount = -1;

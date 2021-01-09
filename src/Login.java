@@ -121,7 +121,7 @@ public class Login extends JFrame {
             System.out.println("密码错误");
             new JOptionPane().showMessageDialog(null,
                     "用户名或密码错误",
-                    "",
+                    "错误",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
