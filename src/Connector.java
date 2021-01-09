@@ -27,6 +27,21 @@ public class Connector {
         return rs;
     }
 
+    // 执行更新SQL命令，返回记录集对象函数
+    public static int executeUpdate (PreparedStatement stmt) throws SQLException{
+        int i= 0;
+        try {
+            i = stmt.executeUpdate();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            free_Stmt(stmt);
+        }
+        return i;
+    }
+
     // TODO: 这个executeQuery 为什么要这样封装？
     // 执行查询SQL命令，返回记录集对象函数
     public static ResultSet executeQuery (String sql) {
