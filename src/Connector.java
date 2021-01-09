@@ -11,15 +11,17 @@ public class Connector {
         System.out.println("SQLException: " + ex.getMessage());
         System.out.println( "SQLState: " + ex.getSQLState());
         System.out.println("VendorError: " + ex.getErrorCode());
+        System.out.println("Cause: " + ex.getCause());
     }
 
 
     // 执行查询SQL命令，返回记录集对象函数
-    public static ResultSet executeQuery (PreparedStatement stmt) {
+    public static ResultSet executeQuery (PreparedStatement stmt) throws SQLException{
         try {
             rs= stmt.executeQuery();
         }catch(SQLException ex) {
             handleSQLException(ex);
+            throw ex;
         }
         // 注意：free statement 会也会close result
         return rs;
@@ -47,7 +49,7 @@ public class Connector {
             stmt = conn.createStatement (ResultSet. TYPE_SCROLL_SENSITIVE,
             ResultSet. CONCUR_READ_ONLY);
             i = stmt.executeUpdate (sql);
-            conn.commit ();
+            //conn.commit ();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -121,6 +123,7 @@ public class Connector {
             // broken Java implementations
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306" + "/" + ConfigIni.DBName +
                     "?" + "user=" + ConfigIni.user + "&password=" + ConfigIni.passwd + "&serverTimezone=UTC");
+            //conn.setAutoCommit(false);
         }catch (SQLException ex) {
             // handle any errors
             System.out.println("SQLException: " + ex.getMessage());
