@@ -16,8 +16,10 @@ public class JTableDemo extends JFrame
 {
     JTable table;
     JPanel con;
+    String dbName = "Worker";
 
     public static void main(String[] agrs) {
+        Connector.initialize();
         JTableDemo frame = new JTableDemo();
         frame.setVisible(true);
     }
@@ -103,7 +105,7 @@ public class JTableDemo extends JFrame
                 }
                 try {
                     System.out.println(temp);
-                    findInfo(stringArr, temp);
+                    findInfo(temp);
                 }
                 catch (SQLException ex){
 
@@ -112,7 +114,21 @@ public class JTableDemo extends JFrame
         });
         buttonCount.addMouseListener(new MouseAdapter() {
             public void mouseClicked (MouseEvent me) {
-                insertInfo();
+                String id = idText.getText();
+                String sex = sexText.getText();
+                String name = nameText.getText();
+                String[] stringArr= {id, sex, name};
+                // 在StringArr记得处理空值
+                String temp = "INSERT INTO worker VALUE" +
+                        "(\""+id+"\", \""+sex+"\", \""+name+"\");";
+                try {
+                    System.out.println(temp);
+                    insertInfo(temp);
+                }
+                catch (SQLException ex){
+                    System.out.println("Insertion failed!\n");
+
+                }
             }
         });
 //        bH1.add(Box.createVerticalStrut(20));
@@ -161,7 +177,7 @@ public class JTableDemo extends JFrame
         //frame.setVisible(true);
     }
     // findInfo希望能传递参数object
-    public void findInfo(String[] args, String sql) throws SQLException {
+    public void findInfo(String sql) throws SQLException {
         if(!Connector.initialize()) {
             System.out.println("连接不上数据库...");
             new JOptionPane().showMessageDialog(null,
@@ -171,9 +187,9 @@ public class JTableDemo extends JFrame
             return;
         }  // 若连接失败返回
         System.out.println("Looking for data...");
-        for (int i = 0; i < args.length; i++) {
-            System.out.println(args[i]);
-        }
+//        for (int i = 0; i < args.length; i++) {
+//            System.out.println(args[i]);
+//        }
         DefaultTableModel tableModel= (DefaultTableModel)table.getModel();    //获得表格模型
 
 //        tableModel.setColumnIdentifiers(new Object[]{"书名","出版社","出版时间","丛书类别","定价"});    //设置表头
@@ -187,12 +203,15 @@ public class JTableDemo extends JFrame
 //        String sql = "SELECT * FROM worker";
         // 防注入攻击
         // 预编译
+
         PreparedStatement stmt = Connector.conn.prepareStatement(sql);
 //        for (int i = 0; i < args.length; i++) {
 //            stmt.setString(i, args[i]);
 //        }
         // 执行
+
         ResultSet rs = Connector.executeQuery(stmt);
+
         ResultSetMetaData rsmd = rs.getMetaData();
         // error在executeQuery会被catch到，能返回大概是空表，此时不出错
 //        if(rs!=null) {
@@ -205,7 +224,6 @@ public class JTableDemo extends JFrame
         for(int i = 1; i <= rsmd.getColumnCount(); i++) {
             title = appendValue(title, rsmd.getColumnName(i));
         }
-
         while(rs.next()) {
             Object[] row = {};
             for(int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -213,21 +231,36 @@ public class JTableDemo extends JFrame
             }
             tableModel.addRow(row);
         }
-
         tableModel.setColumnIdentifiers(title);
         table.setRowHeight(30);
         table.setModel(tableModel);    //应用表格模型
-
+        System.out.println("Looking for data complete...");
     }
-    public void insertInfo() {
-        System.out.println("Delete, World!");
-        //rs = executeQuery("SELECT * FROM course");
-        DefaultTableModel tableModel=(DefaultTableModel) table.getModel();    //获得表格模型
-        int[] selectedRows=table.getSelectedRows();
-        tableModel.removeRow(0);
+    public void insertInfo(String sql) throws SQLException{
+        if(!Connector.initialize()) {
+            System.out.println("连接不上数据库...");
+            new JOptionPane().showMessageDialog(null,
+                    "连接不上数据库...",
+                    "",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }  // 若连接失败返回
+        System.out.println("Inserting data...");
+        PreparedStatement stmt = Connector.conn.prepareStatement(sql);
+        Integer rs = Connector.executeUpdate(sql);
 
-        table.setModel(tableModel);    //应用表格模型
-        System.out.println("Delete, World2!");
+        if (rs == 0) {
+            System.out.println("Insertion failed!");
+            return;
+        }
+        System.out.println("Insertion succeed!");
+        sql = "select * from " + dbName;
+        findInfo(sql);
+
+
+        int[] selectedRows=table.getSelectedRows();
+        //tableModel.removeRow(0);
+
     }
     private Object[] appendValue(Object[] obj, Object newObj) {
 

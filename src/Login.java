@@ -109,9 +109,10 @@ public class Login extends JFrame {
         {
             System .out. println ("密码正确");
             jf.setVisible(false);
-            //关闭数据库连接
-            Connector.conn.close();
-            new Main(); //开始主题运行界面
+            //不能关闭数据库连接草
+            //Connector.conn.close();
+            JTableDemo tableDemo = new JTableDemo(); //开始主题运行界面
+            tableDemo.main(new String [] {});
             //System.exit(114514);
         }
         else {
