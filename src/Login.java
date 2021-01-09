@@ -111,8 +111,10 @@ public class Login extends JFrame {
             jf.setVisible(false);
             //不能关闭数据库连接草
             //Connector.conn.close();
-            JTableDemo tableDemo = new JTableDemo(); //开始主题运行界面
-            tableDemo.main(new String [] {});
+            Main mainPage = new Main(); //开始主题运行界面
+            mainPage.main(new String [] {});
+//            tableDemo.main(new String [] {});
+
             //System.exit(114514);
         }
         else {

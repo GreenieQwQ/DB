@@ -1,92 +1,118 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-public class Main extends JFrame implements Runnable{
-    Thread t = new Thread(this);
-    JFrame jf = new JFrame("Another Java GUI program");
-    JDesktopPane deskpane = new JDesktopPane();//在窗体里建立虚拟桌面并实例化
-    JPanel p = new JPanel();//创建一个面板并实例化
-    Label lp1 = new Label("welcome to this system！本系统纯属练习!");
-    JMenuBar mb = new JMenuBar();
-    //菜单上的图标创建并实例化----------------------------------------------------
-    //ImageIcon icon1=new ImageIcon("image//tjsc.gif");
-    //其他略-----------------------------------------------
+public class Main extends JFrame{
+    JPanel con;
     public Main() {//构造函数
+        JLabel lb = new JLabel("欢迎使用人事工资管理系统", SwingConstants.CENTER);
+        Font f = new Font("黑体", Font.PLAIN, 40);
+        Font f0 = new Font("新宋体", Font.PLAIN, 25);
+        JLabel lb1 = new JLabel("系统管理", SwingConstants.CENTER);
+        JLabel lb2 = new JLabel("员工信息查询", SwingConstants.CENTER);
+        JLabel lb3 = new JLabel("工资查询", SwingConstants.CENTER);
+        Font f1 = new Font("新宋体", Font.PLAIN, 12);
+        lb.setFont(f);
+        lb1.setFont(f0);
+        lb2.setFont(f0);
+        lb3.setFont(f0);
 
-        setTitle("企业员工管理系统"); //设置窗体标题
-        Container con = getContentPane();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        con.setLayout(new BorderLayout()); //创建一个布局
-        con.add(deskpane,BorderLayout.CENTER);//实例虚拟桌面的布局
-        Font f = new Font("新宋体", Font.PLAIN, 12); //设置一个字体，以后都使用这种字体
+        setBounds(100,100,1000,700);
+        JPanel con0=new JPanel();
+        con=new JPanel();
+        con.setBorder(new EmptyBorder(5,5,5,5));
+        con.setLayout(new BorderLayout(0,0));
+        setContentPane(con);
+
+        JPanel p1=new JPanel();
+        JPanel p2=new JPanel();
+        JPanel p3=new JPanel();
+        //JPanel p4=new JPanel();
+        //JPanel p5=new JPanel();
+        JPanel pALL=new JPanel();
+        con0.setLayout(new GridLayout(1,3,15,15));
+        con0.add(p1);
+        con0.add(p2);
+        con0.add(p3);
+
+        p1.setLayout(new GridLayout(10,1,15,15));
+        p2.setLayout(new GridLayout(10,1,15,15));
+        p3.setLayout(new GridLayout(10,1,15,15));
+
+        p1.add(lb1);
+        p2.add(lb2);
+        p3.add(lb3);
 
 
-        //实例化菜单开始
-        JMenu systemM=new JMenu("系统管理");
-        systemM.setFont(f);
-//        systemM.setBounds(50, 50, 700, 20);
-        systemM.setForeground(Color.red);
-        mb.add(systemM);
-        JMenu manageM = new JMenu("信息管理");//实例化菜单栏
-        manageM.setFont(f);
-//        manageM.setBounds(70, 650, 700, 20);
-        manageM.setBackground(Color.blue);
-        mb.add(manageM);
+        JButton buttonWorker = new JButton("员工基本信息查询");
+        JButton buttonDepart = new JButton("部门基本信息查询");
+        JButton buttonWorkerAndDepart = new JButton("员工和任职部门查询");
+        JButton buttonCheckin = new JButton("考勤信息查询");
+        JButton buttonSalary = new JButton("查询本月工资");
+        JButton buttonHistorySalary = new JButton("查询历史工资");
+        JButton buttonAdministrator = new JButton("管理员账号管理");
+        p1.add(buttonAdministrator);
+        p2.add(buttonWorker);
+        p2.add(buttonDepart);
+        p2.add(buttonWorkerAndDepart);
+        p2.add(buttonCheckin);
+        p3.add(buttonSalary);
+        p3.add(buttonHistorySalary);
 
-        //其他略
-        //退出窗体事件
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                    System.exit(0);
-        }});
-        //为系统管理菜单加事件----------------------------------------------------------
-        //其他事件略
-        p.setLayout(new BorderLayout());
-        p.add(lp1,BorderLayout.EAST);
-        p.setBackground(Color.pink);
-        p.add(mb, BorderLayout.NORTH);
-        //p.add(systemM);
+        con.add(lb, BorderLayout.NORTH);
+        con.add(con0, BorderLayout.CENTER);
 
-        //t.start();
-        //这里用的是con，不是jf，getContentPane返回ContentPane
-//        jf.setBounds(300, 100, 400, 200);
-//        jf.setBackground(Color.blue);
-//        jf.add(p);
-//        jf.setVisible(true);
-
-        con.add(p,BorderLayout.SOUTH);
-
-        Toolkit t=Toolkit.getDefaultToolkit();
-        int width=t.getScreenSize().width-120;
-        int height=t.getScreenSize().height-100;
-        // 先width再height
-        setSize(width,height);
-        setLocation(50,25);
-        setVisible(true);
-        setResizable(false);
-    }
-    //线程的方法//用来做字幕滚动
-    public void run(){
-        System.out.println("线程启动了!");
-        Toolkit t=Toolkit.getDefaultToolkit();
-        int x=t.getScreenSize().width;
-        lp1.setForeground(Color.red);
-        while(true) {
-            if (x < -600) {
-                x = t.getScreenSize().width;
+        buttonWorker.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new WorkerJTable();
+                WorkerJTable.main(new String [] {});
+                dispose();
             }
-            lp1.setBounds(x, 0, 700, 20);
-            x -= 10;
-            try{Thread.sleep(100);}catch(Exception e){}
-        }
-        //退出窗体事件
+        });
+        buttonDepart.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new DepartmentTable();
+                DepartmentTable.main(new String [] {});
+                dispose();
+            }
+        });
+        buttonWorkerAndDepart.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new ManagementTable();
+                ManagementTable.main(new String [] {});
+                dispose();
+            }
+        });
+        buttonCheckin.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new AttendenceTable();
+                AttendenceTable.main(new String [] {});
+                dispose();
+            }
+        });
+        buttonAdministrator.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new AdministratorTable();
+                AdministratorTable.main(new String [] {});
+                dispose();
+            }
+        });
+        buttonSalary.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new SalaryTable();
+                SalaryTable.main(new String [] {});
+                dispose();
+            }
+        });
+
     }
     public void windowClosing(WindowEvent e) {
         System.exit(0);
     }
-    public static void main(String[]args) { //主函数
-        new Main();
+    public static void main(String[] args) { //主函数
+        Main frame = new Main();
+        frame.setVisible(true);
     }
 }
