@@ -6,3 +6,10 @@ src/ConfigIni.java
 *.bak
 JDBC_lib
 src/DB.iml
+*.aux
+*.log
+*.out
+*.pdf
+code
+_minted-warm_up
+*.synctex.gz
