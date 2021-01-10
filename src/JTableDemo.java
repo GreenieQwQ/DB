@@ -97,7 +97,7 @@ public class JTableDemo extends JFrame
         System.out.println("Inserting data...");
         PreparedStatement stmt = Connector.conn.prepareStatement(sql);
         try {
-            Integer rs = Connector.executeUpdate(sql);
+            Integer rs = Connector.executeUpdate(stmt);
             if (rs == 0) {
                 System.out.println("Insertion failed!");
                 return;
@@ -120,7 +120,8 @@ public class JTableDemo extends JFrame
         }  // 若连接失败返回
         System.out.println("Deleting data...");
         PreparedStatement stmt = Connector.conn.prepareStatement(sql);
-        Integer rs = Connector.executeUpdate(sql);
+
+        Integer rs = Connector.executeUpdate(stmt);
 
         if (rs == 0) {
             System.out.println("Deletion failed!");
@@ -139,9 +140,9 @@ public class JTableDemo extends JFrame
                     JOptionPane.ERROR_MESSAGE);
             return;
         }  // 若连接失败返回
-        System.out.println("Deleting data...");
+        System.out.println("Modification data...");
         PreparedStatement stmt = Connector.conn.prepareStatement(sql);
-        Integer rs = Connector.executeUpdate(sql);
+        Integer rs = Connector.executeUpdate(stmt);
 
         if (rs == 0) {
             System.out.println("Modification failed!");
