@@ -13,3 +13,4 @@ src/DB.iml
 code
 _minted-warm_up
 *.synctex.gz
+src/ConfigIni.java

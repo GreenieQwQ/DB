@@ -6,7 +6,7 @@
 		zhanghx66@mail2.sysu.edu.cn
 }
 \date{\today}
-\usepackage[cache=false]{minted}
+
 \usepackage{diagbox}
 %\usepackage{fancyhdr}
 %\pagestyle{empty} 
@@ -128,6 +128,7 @@
 编号          & id、编码       & 系统内各对象的唯一标识符      & 8字符变长字符串    \\ \hline
 底薪          & 最低工资        & 一个部门下员工一个月获得的最低工资 & 整型          \\ \hline
 职务薪资        & 职薪          & 在部门下所任职务的薪资       & 整型          \\ \hline
+缺勤惩罚        & -        & 员工没有按时出勤的惩罚       & 整型          \\ \hline
 税费          & 税费记录        & 员工需要交纳的税务费用       & 整型          \\ \hline
 部门人数        & -           & 一个部门所有员工的数目       & 整型          \\ \hline
 时间          & -           & 记录时间              & datetime类型  \\ \hline
@@ -151,7 +152,7 @@
 部门信息        & 存储部门相关信息     & 人数+底薪+名称+编号         \\ \hline
 管理员信息       & 存储管理系统的管理员信息 & 姓名+密码+权限+编号         \\ \hline
 职务信息        & 存储员工职务相关信息   & 职务薪资+职务名称+员工编号+部门编号 \\ \hline
-            &              &                     \\ \hline
+历史工资记录    &存储过去每个月的工资记录 & 时间+员工/部门编号+税费+税后工资                    \\ \hline
 \end{tabular}
 \end{table}
 \subsection{主要数据流}
@@ -219,15 +220,22 @@
 \item 数据量：约100 $\times$ 64 = 6400字节 。
 \end{itemize}
 
+\kuohao{6} 历史薪资表：
+\begin{itemize}
+\item 说明：公司往月发放的薪资记录；
+\item 数据结构：工资信息；
+\item 数据量：每月约100 $\times$ 64 = 6400字节 。
+\end{itemize}
+
 \subsection{主要处理过程}
 
 处理过程名：实时计算薪资。
 
 \begin{itemize}
-\item 说明：因为税费、员工信息的不断变更，需要能根据信息实时计算薪资；
-\item 输入：员工信息表、部门信息表、职务信息表、时间；
+\item 说明：因为考勤、员工信息的不断变更，需要能根据信息实时计算薪资；
+\item 输入：员工信息表、部门信息表、职务信息表、时间、考勤状态表；
 \item 输出：员工薪资表；
-\item 处理：结合员工的考勤、职务。部门、税费、输入的时间自动求出工资。
+\item 处理：结合员工的考勤、职务。部门、输入的时间自动求出工资。
 \end{itemize}
 
 
@@ -235,7 +243,7 @@
 \section{功能需求分析}
 
 企业人事工资管理系统按照上面所述，管理功能的需求比较清晰，主要实现了对员工、部门、员工的考勤、员工的薪资等的管理。系统功能模块如图\ref{gongneng}所示。 \par 
-	其中“信息管理”板块中的每一个功能管理想都包括查看、添加、删除和修改能功能。
+	其中“信息管理”板块中的每一个功能管理项都包括查看、添加、删除和修改功能。
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{gongneng1}
@@ -246,8 +254,8 @@
 \subsection{数据概念结构设计}
 \begin{enumerate}
 	\item 数据流程图。如图\ref{shuju}所示。
-	\item 系统ER图。经调研分析后，得人事工资管理系统整体基本ER图如图xxx所示；
-	\item Mysql中的加强ER图（EER图），通过ER图使用mysql建立的加强版本的ER图如下所示。
+	\item 系统ER图。经调研分析后，得人事工资管理系统整体基本ER图如图\ref{ER}所示；
+	\item Mysql中的加强ER图（EER图），通过ER图使用mysql建立的加强版本的ER图如下图\ref{EER}所示。
 \end{enumerate}
 \begin{figure}[H]
     \centering
@@ -255,27 +263,33 @@
     \caption{系统功能模块图}
     \label{shuju}
 \end{figure}
-
-xx
-
-
-xx
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{ERGraph}
+    \caption{ER图}
+    \label{ER}
+\end{figure}
 
 \subsection{数据库关系模式设计}
-按照ER图到逻辑关系模式的转换规则，可得到系统如下x个关系。
+按照ER图到逻辑关系模式的转换规则，可得到系统如下6个关系。
 \begin{enumerate}
 	\item 员工信息（\uline{员工编号}，姓名，性别）；
 	\item 部门信息（\uline{部门编号}，名称，底薪，人数）；
 	\item 管理信息（\uline{职务薪资}，职务名称，\uline{部门编号}，\uline{员工编号}）；
 	\item 考勤信息（\uline{时间}，考勤状态，\uline{员工编号}）；
-	\item 
+	\item 历史薪资信息（\uline{薪资编号}，日期，员工编号，员工姓名，员工部门，职务，底薪，职务薪资，缺勤惩罚，税前薪资，税费，税后薪资）；
+	\item 系统管理员信息（\uline{管理员编号}，管理员名称，密码，权限）；
 \end{enumerate}
 
 
 \subsection{数据库物理结构设计}
 本系统数据库表的物理设计通过使用mysql workbench的EER图导出的创建表SQL命令来实现，根据ER图建立的EER关系模型如下：
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{EERGraph}
+    \caption{MySQL中的EER图}
+    \label{EER}
+\end{figure}
 生成的创建数据库表的SQL命令主要部分如下：
 \begin{lstlisting}[language=SQL]
 CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`Management` (
@@ -352,21 +366,66 @@ END
 \end{lstlisting}
 
 \subsubsection{建立视图}
-优点：封装细节
-
-如果雾化提升性能
-\subsubsection{建立存储过程}
-
-通过建立存储过程便于调用
-
-\subsubsection{创建索引}
-
-根据数据字典中对于 xx的分析可得，对于的xxx的查询会较为频繁 
-因此为xxx是使用如下语句创建索引
+工资的相关信息分布在不同的表中，而且每月的工资会随考勤情况，不停的变动，所以通过维护视图，能够在展示数据的情形下，保持数据动态性，且避免数据冗余。\par
+使用视图的优点是将细节封装。从下述代码可以看出，为了实时展现薪资，视图要满足以下几点；
+\begin{enumerate}
+	\item 将全部考勤信息中的当月信息筛选出来，这通过“MONTH(time)=MONTH(NOW()) and YEAR(time)=YEAR(NOW()”实现。
+	\item 统计缺勤次数，这看似简单，可以通过聚集函数COUNT()结合GROUP BY子句实现。但实际要求中，为缺勤0次的用户也显示id，所以要用到外连接进行NULL的补充和IFNULL()函数的转换。
+	\item 计算薪资涉及4张表的笛卡尔积，并含有列之间的加减乘除运算。
+\end{enumerate}
 \begin{lstlisting}[language=SQL]
-xxx
+CREATE VIEW `Salary` AS 
+with Checkin(id, LateCount) as 
+	(select worker_id, IFNULL(num, 0) 
+    from attendence LEFT OUTER JOIN 
+   (select worker_id, count(state) from attendence 
+		where state != '正常' and MONTH(time)=MONTH(NOW()) and YEAR(time)=YEAR(NOW())
+		group by worker_id) as LateCount(id, num) 
+    on attendence.worker_id = LateCount.id group by worker_id)
+select Worker.id, Worker.name, Department.name as department_name, salary, base_salary, -100*Checkin.LateCount as LatePunish, salary+base_salary-100*Checkin.LateCount as total_salary 
+from Worker join Management join Department join Checkin 
+where Worker.id = Management.worker_id and Management.department_id = Department.id and Worker.id = Checkin.id;
 \end{lstlisting}
-从而使得对于xxx的查询更为高效。
+对于薪资存储，可见查询的开销很大，是否应该在物理结构中重新设计一张表，来记录这些信息？我们进行了权衡。首先，计算薪资的所需信息都存储在各个不同的表中，若是重新存储一张表会造成大量的信息冗余。其次，考虑到工资表占用的存储空间较大，并且访问相对不频繁，只在每个月发放薪资是需要查询，所以在权衡中，我们认为视图这一展现方式更合理。
+\par 物化视图能进一步提升性能，但对于需要动态变化的表并不适用。
+\subsubsection{建立存储过程}
+建立存储过程，完成向历史工资记录批量写入的任务。每个月调用一次该存储过程，将会把动态变化的每月工资记录，记录到新表中。建立存储过程便于调用。\par 
+存储过程的编写思路很直观，遍历视图salary中每一行，根据税前工资计算税费，然后再将相关信息存储历史薪资记录表SalaryHistory。\par 
+值得一提的是，对于历史薪资记录表SalaryHistory的主码SHid，我们设置了主码自增，这样每次插入，数据库都会自动对编号+1，方便了插入。在Workbench中选中列的“AI”属性就能实现。
+\begin{lstlisting}[language=SQL]
+delimiter //
+create procedure saveHistorySalary()
+BEGIN
+	DECLARE n INT DEFAULT 0;
+    DECLARE date DATETIME;
+	DECLARE i INT DEFAULT 0;
+	DECLARE tax INT DEFAULT 0;
+	DECLARE Tsalary INT DEFAULT 0;
+	SELECT COUNT(*) FROM salary INTO n;
+	SET i=0;
+    SET date = now();
+	WHILE i<n DO 
+		set TAX = 0;
+        SELECT total_salary FROM salary LIMIT i,1 into Tsalary ;
+        if Tsalary <= 10000
+    		then set tax = 0;
+    	elseif Tsalary <= 20000
+    		then set tax = (Tsalary-10000)*0.05;
+    	else set tax = 500 + (Tsalary-20000)*0.1;
+    	end if;
+    	INSERT INTO SalaryHistory(date, worker_id, worker_name, department_name, job, base_salary, salary, punishment, before_tax, tax, total_salary) 
+        SELECT date, id, name, department_name, job, base_salary, salary, LatePUnish, total_salary, tax, total_salary-tax FROM salary LIMIT i,1;
+  		SET i = i + 1;
+	END WHILE;
+END //
+delimiter ;
+\end{lstlisting}
+\subsubsection{创建索引}
+根据数据字典中对于部门的分析可得，Department表的主码是部门id，难以记忆。但对于该部门管理表的查询又会比较频繁，于是对于部门名的查询就会较为频繁，因此为Department表上的name使用如下语句创建索引。
+\begin{lstlisting}[language=SQL]
+create index NAMEINDEX on Department(name);
+\end{lstlisting}
+从而使得对于部门名的查询更为高效。
 
 \section{系统功能的实现}
 
@@ -512,14 +571,73 @@ if(rs.next())
 密码输入正确后，进入主界面模块。
 
 \subsection{主界面模块}
-
 \subsubsection{实现思想}
-
-
+主界面的GUI处理一些交互逻辑，生成相应的sql语句。将这些sql语句传入封装后的Connector，得到返回的查询表或其他结果。再将查询表中的信息提取，展现在GUI界面。\par 
+本实验的GUI界面通过Java的Swing框架实现，最核心的步骤是取得查询表的元数据：
+\begin{lstlisting}[language=java]
+PreparedStatement stmt = Connector.conn.prepareStatement(sql);
+ResultSet rs = Connector.executeQuery(stmt);
+ResultSetMetaData rsmd = rs.getMetaData();
+\end{lstlisting}
+再依次插入到JTable组件中：
+\begin{lstlisting}[language=java]
+Object[] title = {};
+tableModel.setRowCount(0);    //清空表格中的数据
+for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+    title = appendValue(title, rsmd.getColumnName(i));
+}
+while(rs.next()) {
+    Object[] row = {};
+    for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+        row = appendValue(row, rs.getString(i));
+    }
+    tableModel.addRow(row);
+}
+tableModel.setColumnIdentifiers(title);
+table.setRowHeight(30);
+table.setModel(tableModel);    //应用表格模型
+\end{lstlisting}
 \subsubsection{运行界面}
+主界面如下，分为三个部分，系统管理、员工信息查询、工资查询。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{main}
+    \caption{系统主界面}
+\end{figure}
+其中员工信息查询有4个功能，分别为员工基本信息查询、部门基本信息查询、员工和任职部门查询、考勤信息查询。这四个功能的界面类似，以部门信息查询为例：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{department}
+    \caption{部门信息查询}
+\end{figure}
+界面上有4个功能，分别为查询、插入、删除、修改。在相应字段输入相应内容即可实现查询和插入、删除功能。对于修改功能，需要先点击希望删除的表项，程序将会记忆这条信息，在左边的文本框显示相应文字，证明已经选中了相应信息，然后再修改希望改变的字段，就能实现修改操作。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{change}
+    \caption{修改选中表项}
+\end{figure}
+对于工资查询部分仅提供查询功能，这是由于每月工资是视图实时计算的，不需要修改，而历史工资记录属于历史也不需要修改，每月工资查询如图：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{salary}
+    \caption{每月工资查询}
+\end{figure}
+可见工资由三个部分构成：salary是职务薪资，base\_salary是部门底薪，LatePunish代表缺勤惩罚，total\_salary是税前工资。只要在相应的字段输入信息，就能实现多种报表查询，如查询当月部门的薪资信息，或某个职位相关人员的信息。 \par
+在该页面还有“保存至历史薪资记录表”这一按钮，这一按钮调用了存储过程saveHistorySalary()，将会使用当前的时间，把当前的工资写进历史薪资记录表，并展示历史薪资记录表，保存后效果如下图：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{saveSalary}
+    \caption{每月工资查询}
+\end{figure}
+在历史记录薪资中，除了展示每月薪资部分的信息，还会根据税率分级的计算税费，并输出税后工资。对于10000以下不收税，对于10000-20000的部分收5\%的税，对于20000以上的部门收10\%的税，这个计算过程在存储过程中实现。对于历史薪资查询，需要进入到“查询历史薪资”功能，查询功能与员工信息查询类似，不再展示。\par
+更多界面演示请参考附件视频。
 
 \section{实验总结}
-
+(不知道写哪里就写这了)，本次实验中我们使用Java语言结合MySQL数据库，通过JDBC接口，编写了一个基础的人事工资管理系统。我们精心设计了关系结构，做到了满足xx范式？尽可能的减少信息冗余。实现过程中，视图的编写最耗费时间，我们多次对视图进行了重构，通过视图的封装实现了计算工资这一复杂的需求。编写GUI过程中，学习JDBC接口与swing框架组件的交互也很需要精力。\par
+实验中也遇到了有趣的问题，如workbench导出的数据可能属于不同的编码类型，这会导致字符串比较上的一些错误，需要手动的修改相关类型。
+\par 
+该系统还有很大的改进空间，例如对于查询功能的优化，支持范围查询，支持多项更新等。
+\par 
 在本次实验中，我们实现了。
 
 在训练过程中，
@@ -580,11 +698,8 @@ if(rs.next())
 %	\keyword key
 %\end{abstract}
 
-%\inputminted{makefile}{./code/exec.sh}
 
-%\begin{minted}{gas}
-%	code
-%\end{minted}
+
 
 %\begin{figure}[H]
 %	\centering

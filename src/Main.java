@@ -106,6 +106,13 @@ public class Main extends JFrame{
                 dispose();
             }
         });
+        buttonHistorySalary.addMouseListener(new MouseAdapter() {
+            public void mouseClicked (MouseEvent me) {
+                new SalaryHistoryTable();
+                SalaryHistoryTable.main(new String [] {});
+                dispose();
+            }
+        });
 
     }
     public void windowClosing(WindowEvent e) {

@@ -37,7 +37,7 @@ public class JTableDemo extends JFrame
         setContentPane(con);
 
         scrollPane=new JScrollPane();
-        con.add(scrollPane, BorderLayout.EAST);
+        con.add(scrollPane, BorderLayout.CENTER);
         scrollPane.setViewportView(table);
     }
     // 四个功能都封装为接受一条sql语句，然后更新表格
