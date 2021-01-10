@@ -265,11 +265,25 @@
 \end{figure}
 \begin{figure}[H]
     \centering
+    \includegraphics[width=1\linewidth]{SYSER}
+    \caption{标准ER图}
+    \label{shuju}
+\end{figure}
+
+对ER图的分析如下：
+	\begin{itemize}
+	\item 考勤信息和员工信息的联系为多对多联系，一个员工在不同时间有着不同考勤状态，考勤信息也存储这多名员工的信息；
+	\item 员工信息和部门信息的管理联系具有属性职务和职务薪资，为多对一联系——在本系统中，一个员工最多从属于一个部门，而一个部门可以包含多名员工；
+	\item 员工信息和薪资历史信息的联系为一对多联系——一个员工有着多个薪资历史，而一个薪资历史至多只能与一个员工相关联。
+	\end{itemize}
+	
+	按照实验课本绘制的ER图如下所示：
+\begin{figure}[H]
+    \centering
     \includegraphics[width=1\linewidth]{ERGraph}
     \caption{ER图}
     \label{ER}
 \end{figure}
-
 \subsection{数据库关系模式设计}
 按照ER图到逻辑关系模式的转换规则，可得到系统如下6个关系。
 \begin{enumerate}
@@ -668,13 +682,32 @@ table.setModel(tableModel);    //应用表格模型
     \includegraphics[width=0.8\linewidth]{main}
     \caption{系统主界面}
 \end{figure}
-其中员工信息查询有4个功能，分别为员工基本信息查询、部门基本信息查询、员工和任职部门查询、考勤信息查询。这四个功能的界面类似，以部门信息查询为例：
+其中员工信息查询有4个功能，分别为员工基本信息查询、部门基本信息查询、员工和任职部门查询、考勤信息查询。这四个功能的界面类似，如下所示：
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{department}
-    \caption{部门信息查询}
+	\centering
+	\begin{minipage}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{worker}
+		\caption{员工信息查询}
+	\end{minipage}
+	\begin{minipage}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{department}
+		\caption{部门信息查询}
+	\end{minipage}
+	\begin{minipage}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{management}
+		\caption{管理信息查询}
+	\end{minipage}
+\begin{minipage}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{attendence}
+		\caption{考勤信息查询}
+	\end{minipage}
 \end{figure}
-界面上有4个功能，分别为查询、插入、删除、修改。在相应字段输入相应内容即可实现查询和插入、删除功能。对于修改功能，需要先点击希望删除的表项，程序将会记忆这条信息，在左边的文本框显示相应文字，证明已经选中了相应信息，然后再修改希望改变的字段，就能实现修改操作。
+
+每个界面上都有4个功能，分别为查询、插入、删除、修改。在相应字段输入相应内容即可实现查询和插入、删除功能。对于修改功能，需要先点击希望删除的表项，程序将会记忆这条信息，在左边的文本框显示相应文字，证明已经选中了相应信息，然后再修改希望改变的字段，就能实现修改操作。
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{change}
