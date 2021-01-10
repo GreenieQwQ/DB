@@ -278,9 +278,9 @@
 	\item 管理信息（\uline{职务薪资}，职务名称，\uline{部门编号}，\uline{员工编号}）；
 	\item 考勤信息（\uline{时间}，考勤状态，\uline{员工编号}）；
 	\item 历史薪资信息（\uline{薪资编号}，日期，员工编号，员工姓名，员工部门，职务，底薪，职务薪资，缺勤惩罚，税前薪资，税费，税后薪资）；
-	\item 系统管理员信息（\uline{管理员编号}，管理员名称，密码，权限）；
+	\item 系统管理员信息（\uline{管理员编号}，管理员名称，密码，权限）。
 \end{enumerate}
-
+此外，视图salary作为每月工资表，实时计算出员工工资，其列包括（员工编号，员工姓名，部门名称，职务，职务薪资，底薪，缺勤惩罚，总工资）。
 
 \subsection{数据库物理结构设计}
 本系统数据库表的物理设计通过使用mysql workbench的EER图导出的创建表SQL命令来实现，根据ER图建立的EER关系模型如下：
@@ -293,14 +293,68 @@
 生成的创建数据库表的SQL命令主要部分如下：
 \begin{lstlisting}[language=SQL]
 CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`Management` (
-  `salary` INT NULL,
-  `job` VARCHAR(16) NOT NULL,
-  `department_id` VARCHAR(8) NOT NULL,
   `worker_id` VARCHAR(8) NOT NULL,
-  PRIMARY KEY (`job`, `department_id`, `worker_id`))
+  `department_id` VARCHAR(8) NOT NULL,
+  `job` VARCHAR(16) NULL,
+  `salary` INT NULL,
+  PRIMARY KEY (`worker_id`, `department_id`))
 ENGINE = InnoDB;
 \end{lstlisting}
-
+\begin{lstlisting}[language=SQL]
+CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`Administrator` (
+  `id` VARCHAR(8) NOT NULL,
+  `name` VARCHAR(16) NOT NULL,
+  `passwd` VARCHAR(32) NOT NULL,
+  `security` VARCHAR(32) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+\end{lstlisting}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`Department` (
+  `id` VARCHAR(8) NOT NULL,
+  `base_salary` INT NULL,
+  `name` VARCHAR(32) NULL,
+  `member_num` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `NAMEINDEX` (`name` ASC) VISIBLE);
+\end{lstlisting}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`Worker` (
+  `id` VARCHAR(8) NOT NULL,
+  `sex` VARCHAR(2) NULL,
+  `name` VARCHAR(8) NULL,
+  PRIMARY KEY (`id`));
+\end{lstlisting}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`Attendence` (
+  `worker_id` VARCHAR(8) NOT NULL,
+  `time` DATETIME NOT NULL,
+  `state` VARCHAR(8) NULL,
+  PRIMARY KEY (`worker_id`, `time`));
+\end{lstlisting}
+\begin{lstlisting}[language=SQL]
+CREATE TABLE IF NOT EXISTS `EnterpriseDB`.`SalaryHistory` (
+  `SHid` INT NOT NULL AUTO_INCREMENT,
+  `date` DATETIME NULL,
+  `worker_id` VARCHAR(8) NULL,
+  `worker_name` VARCHAR(8) NULL,
+  `department_name` VARCHAR(32) NULL,
+  `job` VARCHAR(16) NULL,
+  `base_salary` INT NULL,
+  `salary` INT NULL,
+  `punishment` INT NULL,
+  `before_tax` INT NULL,
+  `tax` INT NULL,
+  `total_salary` INT NULL,
+  INDEX `worker_id_idx` (`worker_id` ASC) VISIBLE,
+  PRIMARY KEY (`SHid`),
+  CONSTRAINT `worker_id`
+    FOREIGN KEY (`worker_id`)
+    REFERENCES `EnterpriseDB`.`Worker` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+\end{lstlisting}
 
 \subsection{主要创新点}
 
@@ -387,7 +441,7 @@ from Worker join Management join Department join Checkin
 where Worker.id = Management.worker_id and Management.department_id = Department.id and Worker.id = Checkin.id;
 \end{lstlisting}
 对于薪资存储，可见查询的开销很大，是否应该在物理结构中重新设计一张表，来记录这些信息？我们进行了权衡。首先，计算薪资的所需信息都存储在各个不同的表中，若是重新存储一张表会造成大量的信息冗余。其次，考虑到工资表占用的存储空间较大，并且访问相对不频繁，只在每个月发放薪资是需要查询，所以在权衡中，我们认为视图这一展现方式更合理。
-\par 物化视图能进一步提升性能，但对于需要动态变化的表并不适用。
+\par 物化视图能进一步提升性能，但MySQL不支持物化操作。
 \subsubsection{建立存储过程}
 建立存储过程，完成向历史工资记录批量写入的任务。每个月调用一次该存储过程，将会把动态变化的每月工资记录，记录到新表中。建立存储过程便于调用。\par 
 存储过程的编写思路很直观，遍历视图salary中每一行，根据税前工资计算税费，然后再将相关信息存储历史薪资记录表SalaryHistory。\par 
@@ -627,6 +681,8 @@ table.setModel(tableModel);    //应用表格模型
     \caption{修改选中表项}
 \end{figure}
 对于工资查询部分仅提供查询功能，这是由于每月工资是视图实时计算的，不需要修改，而历史工资记录属于历史也不需要修改，每月工资查询如图：
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{salary}
@@ -639,7 +695,7 @@ table.setModel(tableModel);    //应用表格模型
     \includegraphics[width=1\linewidth]{saveSalary}
     \caption{每月工资查询}
 \end{figure}
-在历史记录薪资中，除了展示每月薪资部分的信息，还会根据税率分级的计算税费，并输出税后工资。对于10000以下不收税，对于10000-20000的部分收5\%的税，对于20000以上的部门收10\%的税，这个计算过程在存储过程中实现。对于历史薪资查询，需要进入到“查询历史薪资”功能，查询功能与员工信息查询类似，不再展示。\par
+在历史记录薪资中，除了展示每月薪资部分的信息，还会根据税率分级的计算税费，并输出税后工资。对于10000以下不收税，对于10000-20000的部分收5\%的税，对于20000以上的部门收10\%的税，这个计算过程在存储过程中实现。对于历史薪资查询，需要进入到“查询历史薪资”功能，查询功能与员工信息查询实现思路相似，不再展示。\par
 更多界面演示请参考附件视频。
 
 \section{实验总结}
