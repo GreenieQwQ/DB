@@ -438,7 +438,18 @@ JDBC标准定义了Java程序连接数据库服务器的应用程序接口，通
 
 \vspace{1em}
 
-\kuohao{1} 连接到数据库：
+\kuohao{1} 设置连接数据库的信息：
+
+编写了ConfigIni.java类来存储连接数据库的信息：
+\begin{lstlisting}[language=java]
+public class ConfigIni {
+    static public String passwd = "xxxxxx";
+    static public String user = "root";
+    static public String DBName = "enterprisedb";
+}
+\end{lstlisting}
+
+\kuohao{2} 连接到数据库：
 
 首先建立一个通过调用DriverManager类的getConnection方法来打开一个数据库连接：
 \begin{lstlisting}[language=java]
@@ -447,7 +458,7 @@ conn = DriverManager.getConnection("jdbc:mysql://localhost:3306" + "/" + ConfigI
         "?" + "user=" + ConfigIni.user + "&password=" + ConfigIni.passwd + "&serverTimezone=UTC");
 \end{lstlisting}
 
-\kuohao{2} 向数据库中传递SQL语句：
+\kuohao{3} 向数据库中传递SQL语句：
 
 对执行查询、更新等SQL语句的方法进行了封装，便于获取需要的结果。更新类SQL语句需要获取执行是否成功的结果，JDBC设置为int类型；查询类SQL语句执行返回值为ResulSet结果集类型，并且在执行更新语句完毕后可以将statement释放。执行更新类SQL语句的关键代码如下，对查询类SQL命令的封装类似：
 \begin{lstlisting}[language=java]
@@ -470,8 +481,7 @@ public static int executeUpdate (String sql) {
 }
 \end{lstlisting}
 
-\vspace{1em}
-\kuohao{3} \textbf{防SQL注入}——使用预备语句：
+\kuohao{4} \textbf{防SQL注入}——使用预备语句：
 
 在查询手册的时候调查到，使用预备语句能够有效地防止SQL注入攻击。因此，在数据库连接中我们封装了使用预备语句的接口便于调用，其中封装的执行查询预备语句的函数如下：
 \begin{lstlisting}[language=java]
@@ -504,7 +514,7 @@ ResultSet rs = Connector.executeQuery(stmt);
 其中setString方法会将用户输入的符号进行转义，有效地防止了SQL注入攻击。
 
 \vspace{1em}
-\kuohao{4} 其余辅助函数：
+\kuohao{5} 其余辅助函数：
 
 我们编写的数据库连接类还封装了许多辅助函数便于后续功能的调用，其中关键辅助函数的签名如下：
 \begin{lstlisting}[language=java]
@@ -652,7 +662,7 @@ table.setModel(tableModel);    //应用表格模型
 我们设计的系统还有很大的改进空间，例如还能够对于查询功能的优化、支持范围查询、支持多项更新等；对于
 
 
-通过本次实验，我们对于马尔可夫决策过程、贝尔曼方程等相关知识的理解更为深刻；对于蒙特卡洛树搜索、代码的cython实现、棋盘的正则化等相关过程更为熟悉；对于前沿的强化学习知识——基于蒙特卡洛树搜索与神经网络的Alpha Zero算法有了更深的体会……总而言之，收获颇丰。
+通过本次实验，我们对于数据库应用系统的设计与开发流程的理解更为深刻；对于根据需求构建数据概念结构、关系模式、物理结构等相关过程更为熟悉；对于使用MySql的相关知识——构建触发器、建立视图建立存储过程、使用JDBC连接MySql数据库有了更深的体会……总而言之，收获颇丰。
 
 
 
