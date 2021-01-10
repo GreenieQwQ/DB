@@ -20,7 +20,7 @@ public class AdministratorTable extends JTableDemo
     }
     public AdministratorTable(){
         dbName = "Administrator";
-        JLabel lb = new JLabel("员工和部门信息查询", SwingConstants.CENTER);
+        JLabel lb = new JLabel("管理员信息查询", SwingConstants.CENTER);
         Font f = new Font("新宋体", Font.PLAIN, 40);
         Font f1 = new Font("新宋体", Font.PLAIN, 12);
         lb.setFont(f);

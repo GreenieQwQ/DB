@@ -665,19 +665,19 @@ table.setModel(tableModel);    //应用表格模型
 主界面如下，分为三个部分，系统管理、员工信息查询、工资查询。
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{main}
+    \includegraphics[width=0.8\linewidth]{main}
     \caption{系统主界面}
 \end{figure}
 其中员工信息查询有4个功能，分别为员工基本信息查询、部门基本信息查询、员工和任职部门查询、考勤信息查询。这四个功能的界面类似，以部门信息查询为例：
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{department}
+    \includegraphics[width=0.8\linewidth]{department}
     \caption{部门信息查询}
 \end{figure}
 界面上有4个功能，分别为查询、插入、删除、修改。在相应字段输入相应内容即可实现查询和插入、删除功能。对于修改功能，需要先点击希望删除的表项，程序将会记忆这条信息，在左边的文本框显示相应文字，证明已经选中了相应信息，然后再修改希望改变的字段，就能实现修改操作。
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{change}
+    \includegraphics[width=0.8\linewidth]{change}
     \caption{修改选中表项}
 \end{figure}
 对于工资查询部分仅提供查询功能，这是由于每月工资是视图实时计算的，不需要修改，而历史工资记录属于历史也不需要修改，每月工资查询如图：
@@ -685,14 +685,14 @@ table.setModel(tableModel);    //应用表格模型
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{salary}
+    \includegraphics[width=0.8\linewidth]{salary}
     \caption{每月工资查询}
 \end{figure}
 可见工资由三个部分构成：salary是职务薪资，base\_salary是部门底薪，LatePunish代表缺勤惩罚，total\_salary是税前工资。只要在相应的字段输入信息，就能实现多种报表查询，如查询当月部门的薪资信息，或某个职位相关人员的信息。 \par
 在该页面还有“保存至历史薪资记录表”这一按钮，这一按钮调用了存储过程saveHistorySalary()，将会使用当前的时间，把当前的工资写进历史薪资记录表，并展示历史薪资记录表，保存后效果如下图：
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{saveSalary}
+    \includegraphics[width=0.8\linewidth]{saveSalary}
     \caption{每月工资查询}
 \end{figure}
 在历史记录薪资中，除了展示每月薪资部分的信息，还会根据税率分级的计算税费，并输出税后工资。对于10000以下不收税，对于10000-20000的部分收5\%的税，对于20000以上的部门收10\%的税，这个计算过程在存储过程中实现。对于历史薪资查询，需要进入到“查询历史薪资”功能，查询功能与员工信息查询实现思路相似，不再展示。\par
